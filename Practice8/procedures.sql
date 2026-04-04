@@ -33,23 +33,16 @@ BEGIN
     p_incorrect_data := ARRAY[]::TEXT[];
 
     FOR i IN 1..COALESCE(array_length(p_names, 1), 0) LOOP
-        v_name := btrim(p_names[i]);
-        v_phone := btrim(p_phones[i]);
+        v_name := NULLIF(btrim(p_names[i]), '');
+        v_phone := NULLIF(btrim(p_phones[i]), '');
 
-        IF v_name = '' OR v_phone !~ '^\+?[0-9]{10,15}$' THEN
+        IF v_name IS NULL OR v_phone IS NULL OR v_phone !~ '^\+?[0-9]{10,15}$' THEN
             p_incorrect_data := array_append(
                 p_incorrect_data,
                 format('name="%s", phone="%s"', COALESCE(v_name, 'NULL'), COALESCE(v_phone, 'NULL'))
             );
         ELSE
-            IF EXISTS (SELECT 1 FROM phonebook WHERE name = v_name) THEN
-                UPDATE phonebook
-                SET phone = v_phone
-                WHERE name = v_name;
-            ELSE
-                INSERT INTO phonebook (name, surname, phone)
-                VALUES (v_name, NULL, v_phone);
-            END IF;
+            CALL upsert_user(v_name, v_phone);
         END IF;
     END LOOP;
 END;

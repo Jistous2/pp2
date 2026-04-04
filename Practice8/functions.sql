@@ -9,9 +9,9 @@ LANGUAGE SQL
 AS $$
     SELECT pb.id, pb.name, pb.surname, pb.phone
     FROM phonebook AS pb
-    WHERE pb.name ILIKE '%' || p_pattern || '%'
-       OR COALESCE(pb.surname, '') ILIKE '%' || p_pattern || '%'
-       OR pb.phone ILIKE '%' || p_pattern || '%'
+    WHERE pb.name ILIKE '%' || COALESCE(p_pattern, '') || '%'
+       OR COALESCE(pb.surname, '') ILIKE '%' || COALESCE(p_pattern, '') || '%'
+       OR pb.phone ILIKE '%' || COALESCE(p_pattern, '') || '%'
     ORDER BY pb.id;
 $$;
 
@@ -23,14 +23,11 @@ RETURNS TABLE (
     surname VARCHAR,
     phone VARCHAR
 )
-LANGUAGE plpgsql
+LANGUAGE SQL
 AS $$
-BEGIN
-    RETURN QUERY
     SELECT pb.id, pb.name, pb.surname, pb.phone
     FROM phonebook AS pb
     ORDER BY pb.id
     LIMIT GREATEST(COALESCE(p_limit, 0), 0)
     OFFSET GREATEST(COALESCE(p_offset, 0), 0);
-END;
 $$;
