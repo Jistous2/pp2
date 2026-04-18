@@ -3,7 +3,7 @@ import sys
 from clock import MickeysClock
 
 WIDTH, HEIGHT = 700, 500
-FPS = 10  # 10 fps is enough for a clock that updates every second
+FPS = 10
 
 pygame.init()
 screen = pygame.display.set_mode((WIDTH, HEIGHT))

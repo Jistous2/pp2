@@ -78,7 +78,6 @@ while True:
                 pygame.quit()
                 sys.exit()
 
-    # auto-advance when track ends
     if player.is_playing and not pygame.mixer.music.get_busy():
         player.next_track()
 

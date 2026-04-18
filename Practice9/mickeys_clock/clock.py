@@ -26,17 +26,14 @@ class MickeysClock:
         return surf
 
     def _rotate_hand(self, angle_deg, length_scale=1.0):
-        """Return (rotated_surface, rect) for a hand rotated around its base."""
         img = self.hand_img
         if length_scale != 1.0:
             new_h = int(img.get_height() * length_scale)
             img = pygame.transform.smoothscale(img, (img.get_width(), new_h))
 
-        # rotate — pygame rotates counter-clockwise; we want clockwise from 12 o'clock
         rotated = pygame.transform.rotate(img, -angle_deg)
-        # pivot is at bottom-center of original image; after rotation recalc offset
         orig_w, orig_h = img.get_size()
-        pivot = pygame.math.Vector2(orig_w / 2, orig_h)  # base of hand
+        pivot = pygame.math.Vector2(orig_w / 2, orig_h)
         offset = pygame.math.Vector2(orig_w / 2 - pivot.x, pivot.y - orig_h / 2)
         offset.rotate_ip(angle_deg)
         rect = rotated.get_rect(center=(self.cx + offset.x, self.cy + offset.y))
@@ -47,22 +44,17 @@ class MickeysClock:
         minutes = now.minute
         seconds = now.second
 
-        # 0 min/sec → pointing up (−90°), one full rotation = 360°
         min_angle = minutes / 60 * 360
         sec_angle = seconds / 60 * 360
 
-        # Draw minute hand (right hand in task description)
         min_surf, min_rect = self._rotate_hand(min_angle, length_scale=1.0)
         surface.blit(min_surf, min_rect)
 
-        # Draw second hand (left hand) — slightly shorter
         sec_surf, sec_rect = self._rotate_hand(sec_angle, length_scale=0.8)
         surface.blit(sec_surf, sec_rect)
 
-        # Clock center dot
         pygame.draw.circle(surface, (50, 50, 50), (self.cx, self.cy), 10)
 
-        # Digital time overlay
         time_str = now.strftime("%H:%M:%S")
         text = self.font.render(time_str, True, (30, 30, 30))
         surface.blit(text, (self.cx - text.get_width() // 2, self.cy + 130))
