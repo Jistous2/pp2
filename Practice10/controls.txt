@@ -1,0 +1,27 @@
+===============================
+        RACER
+===============================
+LEFT / RIGHT arrows - move car
+R - restart after game over
+Q - quit after game over
+
+===============================
+        SNAKE
+===============================
+UP arrow    - move up
+DOWN arrow  - move down
+LEFT arrow  - move left
+RIGHT arrow - move right
+R - restart after game over
+Q - quit after game over
+
+===============================
+        PAINT
+===============================
+Left mouse button - draw / select tool / select color
+Pencil  - freehand drawing
+Rect    - click and drag to draw rectangle
+Circle  - click and drag to draw ellipse
+Eraser  - freehand erasing
++/-     - change brush size
+C       - clear canvas

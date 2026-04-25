@@ -55,28 +55,3 @@ def get_paginated(limit: int, offset: int):
 
 def delete_user(username: str | None = None, phone: str | None = None) -> None:
     _exec("CALL delete_from_phonebook(%s, %s);", (username, phone))
-
-
-if __name__ == "__main__":
-    init_db()
-
-    upsert_user("Alice", "+77001234567")
-    upsert_user("Bob", "+77004567890")
-    upsert_user("Alice", "+77009998877")
-
-    invalid = upsert_many_users(
-        [
-            ("Charlie", "+77001112233"),
-            ("Diana", "INVALID_PHONE"),
-            ("Eve", "+77002223344"),
-        ]
-    )
-
-    print("Search for 'Ali':", search_records("Ali"))
-    print("Page limit=2 offset=0:", get_paginated(2, 0))
-    print("Incorrect data from batch insert:", invalid)
-
-    delete_user(username="Bob")
-    delete_user(phone="+77002223344")
-
-    print("All records after delete:", get_paginated(100, 0))
