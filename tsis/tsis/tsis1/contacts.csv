@@ -1,0 +1,4 @@
+name,email,birthday,group,phone,phone_type
+Ivan Petrov,ivan@mail.ru,1995-10-10,Friend,87771112233,mobile
+Marta S,marta@gmail.com,1992-05-20,Work,87005554422,work
+Unknown User,anon@test.com,,Other,5556677,home

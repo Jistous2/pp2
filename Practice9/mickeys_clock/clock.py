@@ -9,55 +9,41 @@ class MickeysClock:
         self.cx = screen_width // 2
         self.cy = screen_height // 2
 
-        hand_path = os.path.join(os.path.dirname(__file__), "images", "mickey_hand.png")
-        if os.path.exists(hand_path):
-            raw = pygame.image.load(hand_path).convert_alpha()
-            self.hand_img = pygame.transform.smoothscale(raw, (40, 120))
+        img_path = os.path.join(os.path.dirname(__file__), "images", "mickeyclock.jpeg")
+        if os.path.exists(img_path):
+            raw = pygame.image.load(img_path).convert()
+            self.mickey_img = pygame.transform.smoothscale(raw, (500, 420))
         else:
-            self.hand_img = self._make_default_hand()
+            self.mickey_img = None
 
-        self.font = pygame.font.SysFont("Arial", 48, bold=True)
-        self.font_small = pygame.font.SysFont("Arial", 22)
+        self.font = pygame.font.SysFont("Arial", 40, bold=True)
 
-    def _make_default_hand(self):
-        surf = pygame.Surface((40, 120), pygame.SRCALPHA)
-        pygame.draw.rect(surf, (200, 200, 200), (15, 10, 10, 90), border_radius=5)
-        pygame.draw.circle(surf, (220, 220, 220), (20, 10), 14)
-        return surf
-
-    def _rotate_hand(self, angle_deg, length_scale=1.0):
-        img = self.hand_img
-        if length_scale != 1.0:
-            new_h = int(img.get_height() * length_scale)
-            img = pygame.transform.smoothscale(img, (img.get_width(), new_h))
-
-        rotated = pygame.transform.rotate(img, -angle_deg)
-        orig_w, orig_h = img.get_size()
-        pivot = pygame.math.Vector2(orig_w / 2, orig_h)
-        offset = pygame.math.Vector2(orig_w / 2 - pivot.x, pivot.y - orig_h / 2)
-        offset.rotate_ip(angle_deg)
-        rect = rotated.get_rect(center=(self.cx + offset.x, self.cy + offset.y))
-        return rotated, rect
+    def _hand_endpoint(self, angle_deg, length):
+        rad = math.radians(angle_deg - 90)
+        x = self.cx + int(math.cos(rad) * length)
+        y = self.cy + int(math.sin(rad) * length)
+        return (x, y)
 
     def draw(self, surface):
         now = datetime.datetime.now()
         minutes = now.minute
         seconds = now.second
 
+        if self.mickey_img:
+            rect = self.mickey_img.get_rect(center=(self.cx, self.cy))
+            surface.blit(self.mickey_img, rect)
+
         min_angle = minutes / 60 * 360
         sec_angle = seconds / 60 * 360
 
-        min_surf, min_rect = self._rotate_hand(min_angle, length_scale=1.0)
-        surface.blit(min_surf, min_rect)
+        min_end = self._hand_endpoint(min_angle, 100)
+        pygame.draw.line(surface, (20, 20, 20), (self.cx, self.cy), min_end, 7)
 
-        sec_surf, sec_rect = self._rotate_hand(sec_angle, length_scale=0.8)
-        surface.blit(sec_surf, sec_rect)
+        sec_end = self._hand_endpoint(sec_angle, 120)
+        pygame.draw.line(surface, (200, 0, 0), (self.cx, self.cy), sec_end, 4)
 
-        pygame.draw.circle(surface, (50, 50, 50), (self.cx, self.cy), 10)
+        pygame.draw.circle(surface, (40, 40, 40), (self.cx, self.cy), 8)
 
         time_str = now.strftime("%H:%M:%S")
         text = self.font.render(time_str, True, (30, 30, 30))
         surface.blit(text, (self.cx - text.get_width() // 2, self.cy + 130))
-
-        label = self.font_small.render("Right = minutes | Left = seconds", True, (120, 120, 120))
-        surface.blit(label, (self.cx - label.get_width() // 2, self.cy + 190))
